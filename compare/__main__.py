@@ -1,5 +1,5 @@
 import sys
-from file_comparer import FileComparer
+from .file_comparer import FileComparer
 
 def validIfTwoArguments(args: list) -> bool:
     isValid = len(args) == 2

@@ -1,5 +1,5 @@
 import csv
-from csv_file import File
+from .file import File
 
 class FileComparer:
     def __init__(self, args: list):

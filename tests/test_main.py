@@ -1,5 +1,5 @@
 import unittest
-from main import validIfTwoArguments
+from compare.__main__ import validIfTwoArguments
 
 class TestValidArguments(unittest.TestCase):
     def testTwoArgumentsAreValid(self):
