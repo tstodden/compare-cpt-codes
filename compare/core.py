@@ -25,13 +25,13 @@ class File:
     def getLineDict(self) -> dict:
         if (self.isConverted == False):
             self.convertFileLinesToDict()
-            self.isConverted = True
         return self.lineDict
 
     def convertFileLinesToDict(self):
         for ln in self.getCleanLinesInFile():
             hash_ = self.convertStringToMD5Hash(ln)
             self.lineDict[hash_] = ln.split(sep=',')
+        self.isConverted = True
 
     def getCleanLinesInFile(self) -> [str]:
         return list(map(str.strip, self.lines))
