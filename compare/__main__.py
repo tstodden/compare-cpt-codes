@@ -1,5 +1,6 @@
 import sys
-from .file_comparer import FileComparer
+from .core import FileContent, File, FileComparer
+from .services import FileController
 
 def validIfTwoArguments(args: list) -> bool:
     isValid = len(args) == 2
@@ -7,5 +8,8 @@ def validIfTwoArguments(args: list) -> bool:
 
 args = sys.argv[1:]
 if validIfTwoArguments(args):
-    comparer = FileComparer(args)
-    comparer.compare()
+    controller = FileController()
+    oldFile = File(controller.getFileContent(args[0]))
+    newFile = File(controller.getFileContent(args[1]))
+    comparer = FileComparer(oldFile, newFile)
+    controller.writeFileContent(comparer.compare())
