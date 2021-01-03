@@ -13,30 +13,27 @@ class FileContent:
 class File:
     fileName: str
     lines: [str]
-    lineDict: dict
-    isConverted: bool
+    _lineDict: dict
+    _isConverted: bool
 
     def __init__(self, fileContent: FileContent):
         self.fileName = fileContent.fileName
         self.lines = fileContent.lines
-        self.lineDict = dict()
-        self.isConverted = False
+        self._lineDict = dict()
+        self._isConverted = False
 
     def getLineDict(self) -> dict:
-        if (self.isConverted == False):
-            self.convertFileLinesToDict()
-        return self.lineDict
+        if (self._isConverted == False):
+            self._convertFileLinesToDict()
+        return self._lineDict
 
-    def convertFileLinesToDict(self):
-        for ln in self.getCleanLinesInFile():
-            hash_ = self.convertStringToMD5Hash(ln)
-            self.lineDict[hash_] = ln.split(sep=',')
-        self.isConverted = True
-
-    def getCleanLinesInFile(self) -> [str]:
-        return list(map(str.strip, self.lines))
+    def _convertFileLinesToDict(self):
+        for ln in self.lines:
+            hash_ = self._convertStringToMD5Hash(ln.strip())
+            self._lineDict[hash_] = ln
+        self._isConverted = True
     
-    def convertStringToMD5Hash(self, string: str) -> str:
+    def _convertStringToMD5Hash(self, string: str) -> str:
         bytes_ = string.encode()
         return hashlib.md5(bytes_).hexdigest()
 
@@ -49,16 +46,16 @@ class FileComparer:
         self.currentFile = _currentFile
     
     def compare(self) -> FileContent:
-        lines = [self.currentFile.getLineDict()[key] for key in self.getDifferentKeys()]
+        lines = [self.currentFile.getLineDict()[key] for key in self._getDifferentKeys()]
         return FileContent(OUTPUT_FILE_NAME, lines)
 
-    def getDifferentKeys(self) -> [str]:
+    def _getDifferentKeys(self) -> [str]:
         differentKeys = list()
         for key in self.currentFile.getLineDict():
-            if self.isDifferentInPreviousFile(key):
+            if self._isDifferentInPreviousFile(key):
                 differentKeys.append(key)
         return differentKeys
 
-    def isDifferentInPreviousFile(self, key: str) -> bool:
+    def _isDifferentInPreviousFile(self, key: str) -> bool:
         isSame = key in self.previousFile.getLineDict()
         return not isSame

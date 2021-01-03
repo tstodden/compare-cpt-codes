@@ -23,8 +23,8 @@ class TestFileController(unittest.TestCase):
         sut.writeFileContent(results)
 
         with open("output.csv", "r") as f:
-            resultContent = f.readlines()
-        self.assertEqual(["23451,description\n"], resultContent)
+            result = f.readlines()
+        self.assertEqual(["23451,description\n"], result)
     
     def tearDown(self):
         os.remove("tests/data/test-previous.csv")
