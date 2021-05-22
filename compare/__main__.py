@@ -1,15 +1,22 @@
+import logging
 import sys
-from .core import FileContent, File, FileComparer
-from .services import FileController
 
-def validIfTwoArguments(args: list) -> bool:
-    isValid = len(args) == 2
-    return isValid
+from .comparer import FileComparer
+from .controller import FileController
+from .file import File
+
+
+def validate(args: list) -> bool:
+    is_valid = len(args) == 2
+    return is_valid
+
 
 args = sys.argv[1:]
-if validIfTwoArguments(args):
-    controller = FileController()
-    oldFile = File(controller.getFileContent(args[0]))
-    newFile = File(controller.getFileContent(args[1]))
-    comparer = FileComparer(oldFile, newFile)
-    controller.writeFileContent(comparer.compare())
+if not validate(args):
+    logging.fatal("Only two arguments are allowed")
+
+controller = FileController()
+old_file = File(controller.get_file(args[0]))
+new_file = File(controller.get_file(args[1]))
+comparer = FileComparer(old_file, new_file)
+controller.write_file(comparer.compare())

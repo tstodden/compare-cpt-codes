@@ -1,83 +1,89 @@
-import unittest
-from compare.core import FileContent, File, FileComparer
+from compare.comparer import OUTPUT_FILE_NAME, FileComparer
+from compare.file import File
+from compare.models import FileContent
 
 TEST_DATA1 = "12345,description\n"
 TEST_DATA2 = "67890,description\n"
 TEST_DATA3 = "23451,description\n"
 
-TEST_HASH1 = "51cbc4a28da5ca12cd0cfe8bf653f934"
-TEST_HASH2 = "b2ca3638f7b2f5e0f3e7735d9c27569f"
+TEST_HASH1 = "a587b9ca9c40faade4d867e6a72109fc38312d45"
+TEST_HASH2 = "65c26c9c3d3cf8935623c50ac99fe5322acb52a3"
 
-class TestFile(unittest.TestCase):
+
+class TestFile():
     def test_converting_an_empty_file_to_a_dictionary(self):
-        fileContent = FileContent("test.csv", [])
-        sut = File(fileContent)
+        content = FileContent("test.csv", [])
+        sut = File(content)
 
-        result = sut.getLineDict()
+        got = sut.lines
 
-        self.assertDictEqual({}, result)
+        want = {}
+        assert got == want
 
     def test_converting_one_line_to_a_dictionary(self):
-        fileContent = FileContent("test.csv", [TEST_DATA1])
-        sut = File(fileContent)
+        content = FileContent("test.csv", [TEST_DATA1])
+        sut = File(content)
 
-        result = sut.getLineDict()
+        got = sut.lines
 
-        self.assertDictEqual({TEST_HASH1:TEST_DATA1}, result)
+        want = {TEST_HASH1: TEST_DATA1.strip()}
+        assert got == want
 
     def test_converting_multiple_lines_to_a_dictionary(self):
-        fileContent = FileContent("test.csv", [TEST_DATA1, TEST_DATA2])
-        sut = File(fileContent)
+        content = FileContent("test.csv", [TEST_DATA1, TEST_DATA2])
+        sut = File(content)
 
-        result = sut.getLineDict()
+        got = sut.lines
 
-        self.assertDictEqual({TEST_HASH1:TEST_DATA1, TEST_HASH2:TEST_DATA2}, result)
+        want = {TEST_HASH1: TEST_DATA1.strip(), TEST_HASH2: TEST_DATA2.strip()}
+        assert got == want
 
-class TestFileComparer(unittest.TestCase):
-    def setUp(self):
-        self.fileWithOneLine = File(
-            FileContent("test.csv", [TEST_DATA1])
-        )
-        self.sameFileWithOneLine = File(
-            FileContent("test.csv", [TEST_DATA1])
-        )
-        self.differentFileWithOneLine = File(
-            FileContent("test.csv", [TEST_DATA3])
-        )
-        self.fileWithMultipleLines = File(
-            FileContent("test.csv", [TEST_DATA1,TEST_DATA2])
-        )
-        self.sameFileWithMultipleLines = File(
-            FileContent("test.csv", [TEST_DATA1,TEST_DATA2])
-        )
-        self.differentFileWithMultipleLines = File(
-            FileContent("test.csv", [TEST_DATA3,TEST_DATA2])
-        )
 
+class TestFileComparer():
     def test_files_that_are_the_same_with_one_line(self):
-        sut = FileComparer(self.fileWithOneLine, self.sameFileWithOneLine)
+        file_with_one_line = File(FileContent("test.csv", [TEST_DATA1]))
+        same_file = File(FileContent("test.csv", [TEST_DATA1]))
+        sut = FileComparer(file_with_one_line, same_file)
 
-        result = sut.compare()
+        got = sut.compare()
 
-        self.assertEqual([], result.lines)
+        want = FileContent(OUTPUT_FILE_NAME, [])
+        assert got == want
 
     def test_files_that_are_different_with_one_line(self):
-        sut = FileComparer(self.fileWithOneLine, self.differentFileWithOneLine)
+        file_with_one_line = File(FileContent("test.csv", [TEST_DATA1]))
+        different_file = File(FileContent("test.csv", [TEST_DATA3]))
+        sut = FileComparer(file_with_one_line, different_file)
 
-        result = sut.compare()
+        got = sut.compare()
 
-        self.assertEqual([TEST_DATA3], result.lines)
+        want = FileContent(OUTPUT_FILE_NAME, [TEST_DATA3])
+        assert got == want
 
     def test_files_that_are_the_same_with_multiple_lines(self):
-        sut = FileComparer(self.fileWithMultipleLines, self.sameFileWithMultipleLines)
+        file_with_multiple_lines = File(
+            FileContent("test.csv", [TEST_DATA1, TEST_DATA2])
+        )
+        same_file = File(
+            FileContent("test.csv", [TEST_DATA1, TEST_DATA2])
+        )
+        sut = FileComparer(file_with_multiple_lines, same_file)
 
-        result = sut.compare()
+        got = sut.compare()
 
-        self.assertEqual([], result.lines)
+        want = FileContent(OUTPUT_FILE_NAME, [])
+        assert got == want
 
     def test_files_that_are_different_with_multiple_lines(self):
-        sut = FileComparer(self.fileWithMultipleLines, self.differentFileWithMultipleLines)
+        file_with_multiple_lines = File(
+            FileContent("test.csv", [TEST_DATA1, TEST_DATA2])
+        )
+        different_file = File(
+            FileContent("test.csv", [TEST_DATA3, TEST_DATA2])
+        )
+        sut = FileComparer(file_with_multiple_lines, different_file)
 
-        result = sut.compare()
+        got = sut.compare()
 
-        self.assertEqual([TEST_DATA3], result.lines)
+        want = FileContent(OUTPUT_FILE_NAME, [TEST_DATA3])
+        assert got == want
